@@ -2,6 +2,7 @@ const { Client, LocalAuth } = require('whatsapp-web.js')
 const qrcode = require('qrcode-terminal')
 const express = require('express')
 const jwt = require('jsonwebtoken')
+const QRCode = require('qrcode')
 
 const app = express()
 const port = 3000
@@ -32,7 +33,16 @@ const jwtVerify = (req, res, next) => {
 }
 
 app.use(express.json())
-app.use(jwtVerify)
+app.use('/send', jwtVerify)
+
+let whatsappQrCode = null
+app.get('/login', (req, res) => {
+    let qr = null
+    QRCode.toDataURL(whatsappQrCode, (err, url) => {
+        qr = url
+    })
+    res.send(qr)
+})
 
 app.post('/send', (req, res) => {
     const phoneNumber = req.body.phoneNumber
@@ -47,10 +57,15 @@ app.post('/send', (req, res) => {
 })
 
 client.on('qr', (qr) => {
+    whatsappQrCode = qr
     console.log('QR RECEIVED', qr)
     qrcode.generate(qr, {
         small: true
     })
+})
+
+client.on('authenticated', () => {
+    whatsappQrCode = null
 })
 
 client.on('ready', () => {
