@@ -14,7 +14,7 @@ const client = new Client({
 const jwtVerify = (req, res, next) => {
     const bearerToken = req.headers['authorization']
     if (typeof bearerToken == 'undefined') {
-        console.log('bearerToken undefined')
+        // console.log('bearerToken undefined')
         return res.send('JWT required').status(401)
     }
     try {
@@ -42,7 +42,10 @@ app.get('/login', (req, res) => {
     QRCode.toDataURL(whatsappQrCode, (err, url) => {
         qr = url
     })
-    res.send(qr)
+    res.send({
+        message: 'qr',
+        qr: whatsappQrCode
+    })
 })
 
 app.post('/send', (req, res) => {
@@ -59,15 +62,15 @@ app.post('/send', (req, res) => {
 
 client.on('qr', (qr) => {
     whatsappQrCode = qr
-    console.log('QR RECEIVED', qr)
+    // console.log('QR RECEIVED', whatsappQrCode)
     qrcode.generate(qr, {
         small: true
     })
 })
 
-client.on('authenticated', () => {
-    whatsappQrCode = null
-})
+// client.on('authenticated', () => {
+//     whatsappQrCode = null
+// })
 
 client.on('ready', () => {
     console.log('Client is ready')
