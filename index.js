@@ -3,6 +3,7 @@ const qrcode = require('qrcode-terminal')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const QRCode = require('qrcode')
+require('dotenv').config()
 
 const app = express()
 const port = 3000
@@ -23,7 +24,7 @@ const jwtVerify = (req, res, next) => {
             return res.send('JWT Invalid').status(401)
         }
         // console.log(token)
-        jwt.verify(token, 'SyahrulSafarilaRahasia')
+        jwt.verify(token, process.env.JWT_SECRET)
     } catch (error) {
         // console.log(error)
         return res.send('JWT Invalid').status(401)
